@@ -241,6 +241,34 @@ open class SessionManager {
             return request(originalRequest, failedWith: error)
         }
     }
+    
+    /// Creates a `DataRequest` to retrieve the contents of the specified `url`, `method`, `parameters`, and `headers`.
+    /// Uses `JSONEncoding` for encoding `parameters`.
+    ///
+    /// - parameter url:        The URL.
+    /// - parameter method:     The HTTP method. `.get` by default.
+    /// - parameter parameters: The array of parameters.
+    /// - parameter headers:    The HTTP headers. `nil` by default.
+    ///
+    /// - returns: The created `DataRequest`.
+    @discardableResult
+    open func request(
+        _ url: URLConvertible,
+        method: HTTPMethod = .get,
+        parameters: [Parameters],
+        headers: HTTPHeaders? = nil)
+    -> DataRequest
+    {
+        var originalRequest: URLRequest?
+        
+        do {
+            originalRequest = try URLRequest(url: url, method: method, headers: headers)
+            let encodedURLRequest = try JSONEncoding.default.encode(originalRequest!, withJSONObject: parameters)
+            return request(encodedURLRequest)
+        } catch {
+            return request(originalRequest, failedWith: error)
+        }
+    }
 
     /// Creates a `DataRequest` to retrieve the contents of a URL based on the specified `urlRequest`.
     ///
